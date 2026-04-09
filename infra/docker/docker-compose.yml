@@ -1,0 +1,23 @@
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    container_name: titan-jaeger
+    restart: unless-stopped
+    env_file:
+      - ../jaeger/jaeger.env
+    ports:
+      - "16686:16686"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.104.0
+    container_name: titan-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol-contrib/otel-collector-config.yaml"]
+    volumes:
+      - ../otel-collector/otel-collector-config.yaml:/etc/otelcol-contrib/otel-collector-config.yaml:ro
+    depends_on:
+      - jaeger
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "13133:13133"

@@ -1,0 +1,231 @@
+name: titan-takeaway
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: titan-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Your_strong_Password123"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P $$MSSQL_SA_PASSWORD -Q \"SELECT 1\" || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 25s
+    profiles: ["minimal", "lite", "app", "full"]
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.102.1
+    container_name: titan-otel-collector
+    command: ["--config=/etc/otelcol-contrib/otel-collector-config.yaml"]
+    volumes:
+      - ./infra/otel-collector/otel-collector-config.yaml:/etc/otelcol-contrib/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    profiles: ["minimal", "lite", "app", "full"]
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: titan-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=2d"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    profiles: ["minimal", "lite", "full"]
+
+  grafana:
+    image: grafana/grafana:11.1.4
+    container_name: titan-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./infra/grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      prometheus:
+        condition: service_started
+    profiles: ["minimal", "lite", "full"]
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    container_name: titan-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "14250:14250"
+      - "4319:4318"
+    profiles: ["lite", "full"]
+
+  loki:
+    image: grafana/loki:3.1.1
+    container_name: titan-loki
+    command: ["-config.file=/etc/loki/loki-config.yaml"]
+    volumes:
+      - ./infra/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+    profiles: ["lite", "full"]
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: titan-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    volumes:
+      - ./infra/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    # Optional search profile: enable full-text log indexing exercises on demand.
+    profiles: ["search", "full"]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.3
+    container_name: titan-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    volumes:
+      # Placeholder config for optional search labs.
+      - ./infra/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_started
+    # Optional search profile: pairs with Elasticsearch when enabled.
+    profiles: ["search", "full"]
+
+  # Application Services
+  ordering-api:
+    build:
+      context: ./services/ordering-api
+      dockerfile: Dockerfile
+    container_name: titan-ordering-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: ordering-api
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=TitanTakeaway;User Id=sa;Password=Your_strong_Password123;TrustServerCertificate=True"
+    ports:
+      - "5000:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    profiles: ["app", "full"]
+
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    container_name: titan-payment-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: payment-service
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=TitanTakeaway;User Id=sa;Password=Your_strong_Password123;TrustServerCertificate=True"
+    ports:
+      - "5001:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    profiles: ["app", "full"]
+
+  kitchen-service:
+    build:
+      context: ./services/kitchen-service
+      dockerfile: Dockerfile
+    container_name: titan-kitchen-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: kitchen-service
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=TitanTakeaway;User Id=sa;Password=Your_strong_Password123;TrustServerCertificate=True"
+    ports:
+      - "5002:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    profiles: ["app", "full"]
+
+  delivery-service:
+    build:
+      context: ./services/delivery-service
+      dockerfile: Dockerfile
+    container_name: titan-delivery-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: delivery-service
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=TitanTakeaway;User Id=sa;Password=Your_strong_Password123;TrustServerCertificate=True"
+    ports:
+      - "5003:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    profiles: ["app", "full"]
+
+  web-app:
+    build:
+      context: ./frontend/web-app
+      dockerfile: Dockerfile
+    container_name: titan-web-app
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: web-app
+      # Point to ordering-api for backend communication
+      OrderingApiUrl: "http://ordering-api:8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      ordering-api:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    profiles: ["app", "full"]
+
+volumes:
+  sqlserver-data:
+  prometheus-data:
+  grafana-data:
+  loki-data:
+  elasticsearch-data:

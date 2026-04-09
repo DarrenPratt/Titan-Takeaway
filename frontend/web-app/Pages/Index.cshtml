@@ -1,0 +1,62 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Training Console";
+}
+
+<section class="mb-4">
+    <h1 class="display-6 mb-2">Titan-Takeaway Frontend Shell</h1>
+    <p class="text-secondary mb-0">Minimal landing page for service visibility and quick observability navigation.</p>
+</section>
+
+<section class="mb-4">
+    <h2 class="h5 mb-3">Service Health (placeholders)</h2>
+    <div class="row g-3" id="serviceHealthGrid">
+        <div class="col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6">Ordering API</h3>
+                    <p class="mb-2 text-muted small">http://localhost:5000/health</p>
+                    <span class="badge text-bg-secondary">Unknown</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6">Payment Service</h3>
+                    <p class="mb-2 text-muted small">http://localhost:5001/health</p>
+                    <span class="badge text-bg-secondary">Unknown</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6">Kitchen Service</h3>
+                    <p class="mb-2 text-muted small">http://localhost:5002/health</p>
+                    <span class="badge text-bg-secondary">Unknown</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6">Delivery Tracker</h3>
+                    <p class="mb-2 text-muted small">http://localhost:5003/health</p>
+                    <span class="badge text-bg-secondary">Unknown</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2 class="h5 mb-3">Quick Links</h2>
+    <div class="list-group">
+        <a class="list-group-item list-group-item-action" href="http://localhost:3000" target="_blank" rel="noreferrer">Grafana Dashboards</a>
+        <a class="list-group-item list-group-item-action" href="http://localhost:16686" target="_blank" rel="noreferrer">Jaeger Traces</a>
+        <a class="list-group-item list-group-item-action" href="http://localhost:9090" target="_blank" rel="noreferrer">Prometheus Metrics</a>
+        <a class="list-group-item list-group-item-action" href="http://localhost:3100" target="_blank" rel="noreferrer">Loki Logs</a>
+    </div>
+</section>

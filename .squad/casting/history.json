@@ -1,0 +1,65 @@
+{
+  "universe_usage_history": [
+    {
+      "assignment_id": "titan-takeaway-init-20260325",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "agent_count": 6
+    },
+    {
+      "assignment_id": "titan-takeaway-observability-expansion-20260325",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T14:13:14Z",
+      "agent_count": 8
+    },
+    {
+      "assignment_id": "titan-takeaway-github-expert-20260325",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T14:22:45Z",
+      "agent_count": 9
+    }
+  ],
+  "assignment_cast_snapshots": {
+    "titan-takeaway-init-20260325": {
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "members": [
+        "tony",
+        "peter",
+        "bruce",
+        "rocket",
+        "vision",
+        "clint"
+      ]
+    },
+    "titan-takeaway-observability-expansion-20260325": {
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T14:13:14Z",
+      "members": [
+        "tony",
+        "peter",
+        "bruce",
+        "rocket",
+        "vision",
+        "natasha",
+        "stephen",
+        "clint"
+      ]
+    },
+    "titan-takeaway-github-expert-20260325": {
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T14:22:45Z",
+      "members": [
+        "tony",
+        "peter",
+        "bruce",
+        "rocket",
+        "vision",
+        "natasha",
+        "stephen",
+        "nick",
+        "clint"
+      ]
+    }
+  }
+}

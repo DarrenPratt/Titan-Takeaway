@@ -1,0 +1,81 @@
+{
+  "agents": {
+    "tony": {
+      "persistent_name": "Tony",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "peter": {
+      "persistent_name": "Peter",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "bruce": {
+      "persistent_name": "Bruce",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "rocket": {
+      "persistent_name": "Rocket",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "vision": {
+      "persistent_name": "Vision",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "natasha": {
+      "persistent_name": "Natasha",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T14:13:14Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "stephen": {
+      "persistent_name": "Stephen",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T14:13:14Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "nick": {
+      "persistent_name": "Nick",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T14:22:45Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "clint": {
+      "persistent_name": "Clint",
+      "universe": "Marvel Cinematic Universe",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "scribe": {
+      "persistent_name": "Scribe",
+      "universe": "exempt",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    },
+    "ralph": {
+      "persistent_name": "Ralph",
+      "universe": "exempt",
+      "created_at": "2026-03-25T11:52:26Z",
+      "legacy_named": false,
+      "status": "active"
+    }
+  }
+}

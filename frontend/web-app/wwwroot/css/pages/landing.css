@@ -1,0 +1,7 @@
+#serviceHealthGrid .card {
+    border: 1px solid #e9ecef;
+}
+
+#serviceHealthGrid .badge {
+    min-width: 6rem;
+}
